@@ -48,7 +48,7 @@ const Tooltip = styled.div<{ visible: boolean; x: number; y: number; isEditing: 
   top: ${props => props.y}px;
   background: white;
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 28px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 1000;
@@ -102,6 +102,23 @@ const Tooltip = styled.div<{ visible: boolean; x: number; y: number; isEditing: 
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #666;
+    padding: 4px;
+    line-height: 1;
+    
+    &:hover {
+      color: #333;
+    }
   }
 `;
 
@@ -367,30 +384,7 @@ const ContractEditor: React.FC<ContractEditorProps> = ({
     }
   };
 
-  const handleMouseLeave = (e: MouseEvent) => {
-    const tooltipElement = document.querySelector('.tooltip') as HTMLElement;
-    const relatedTarget = e.relatedTarget as HTMLElement;
-    const highlightElement = tooltip.currentElement;
-    
-    // Mouse tooltip veya highlight üzerinde mi kontrol et
-    if (tooltipElement?.contains(relatedTarget) || 
-        highlightElement?.contains(relatedTarget) ||
-        tooltipElement === relatedTarget ||
-        highlightElement === relatedTarget) {
-      return;
-    }
-
-    // Mouse tooltip ile highlight arasındaki boşlukta mı kontrol et
-    const tooltipRect = tooltipElement?.getBoundingClientRect();
-    const highlightRect = highlightElement?.getBoundingClientRect();
-
-    if (tooltipRect && highlightRect) {
-      const mouseY = e.clientY;
-      if (mouseY > highlightRect.top && mouseY < tooltipRect.bottom) {
-        return;
-      }
-    }
-
+  const handleCloseTooltip = () => {
     setTooltip(prev => ({ ...prev, visible: false, isEditing: false }));
   };
 
@@ -544,13 +538,11 @@ const ContractEditor: React.FC<ContractEditorProps> = ({
     
     highlightElements.forEach(element => {
       element.addEventListener('mouseenter', handleMouseEnter as EventListener);
-      element.addEventListener('mouseleave', handleMouseLeave as EventListener);
     });
 
     return () => {
       highlightElements.forEach(element => {
         element.removeEventListener('mouseenter', handleMouseEnter as EventListener);
-        element.removeEventListener('mouseleave', handleMouseLeave as EventListener);
       });
     };
   }, [content]);
@@ -638,6 +630,7 @@ const ContractEditor: React.FC<ContractEditorProps> = ({
         y={tooltip.y}
         isEditing={tooltip.isEditing}
       >
+        <button className="close-button" onClick={handleCloseTooltip}>×</button>
         {tooltip.isEditing ? (
           <>
             <textarea
