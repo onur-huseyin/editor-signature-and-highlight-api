@@ -39,6 +39,7 @@ const EditorContainer = styled.div`
   border-radius: 4px;
   position: relative;
   overflow: scroll;
+  min-height: 100vh;
 `;
 
 const Tooltip = styled.div<{ visible: boolean; x: number; y: number; isEditing: boolean }>`
